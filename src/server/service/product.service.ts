@@ -25,12 +25,12 @@ export class ProductServiceImpl implements ProductService {
     async createProduct(req: CreateProductRequest): Promise<void> {
         if (!req || !req.name) throw new Error("Invalid product data");
         const now = new Date();
-
+        const productId = crypto.randomUUID();
         const items = req.items?.map((it: ItemCreate) => ({
             id: crypto.randomUUID(),
             createdAt: now,
             updatedAt: now,
-            productId: it.productId,
+            productId: productId,
             name: it.name,
             quantity: it.quantity,
             unitQuantity: it.unitQuantity,
@@ -39,7 +39,7 @@ export class ProductServiceImpl implements ProductService {
         })) ?? [];
 
         const product: Product = {
-            id: crypto.randomUUID(),
+            id: productId,
             name: req.name,
             totalPrice: items.reduce((sum, item) => sum + item.totalPrice, 0),
             items,

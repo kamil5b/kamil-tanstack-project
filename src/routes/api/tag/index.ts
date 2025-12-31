@@ -1,10 +1,10 @@
 import { initInjection } from '@/server'
 import { PaginationRequestSchema } from '@/shared/requests/schemas/common';
-import { CreateProductRequestSchema, UpdateProductRequestSchema } from '@/shared/requests/schemas/product';
+import { CreateTagRequestSchema, UpdateTagRequestSchema } from '@/shared/requests/schemas/tag';
 import { createFileRoute } from '@tanstack/react-router'
 import { json } from '@tanstack/react-start'
 
-export const Route = createFileRoute('/api/product/')({
+export const Route = createFileRoute('/api/tag/')({
   validateSearch: (search) => PaginationRequestSchema.parse(search),
   server: {
     handlers: {
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/api/product/')({
         const searchParams = Object.fromEntries(url.searchParams);
         const { page, limit } = PaginationRequestSchema.parse(searchParams);
 
-        const list = await svc.productSvc.listProduct({ page, limit });
+        const list = await svc.tagSvc.listTag({ page, limit });
         return json(list);
       },
       POST: async ({ request }) => {
@@ -24,19 +24,19 @@ export const Route = createFileRoute('/api/product/')({
         const body = await request.json();
 
         // Validate and use the result of parsing
-        const validated = CreateProductRequestSchema.parse(body);
-        await svc.productSvc.createProduct(validated);
+        const validated = CreateTagRequestSchema.parse(body);
+        await svc.tagSvc.createTag(validated);
 
         // Service returns void; respond with a JSON-serializable value.
-        return json({message: "Product created successfully"}, { status: 201 });
+        return json({message: "Tag created successfully"}, { status: 201 });
       },
       PATCH: async ({ request }) => {
         const svc = initInjection();
         const body = await request.json();
 
-        const validated = UpdateProductRequestSchema.parse(body);
-        await svc.productSvc.updateProduct(validated);
-        return json({message: "Product updated successfully"}, { status: 200 });
+        const validated = UpdateTagRequestSchema.parse(body);
+        await svc.tagSvc.updateTag(validated);
+        return json({message: "Tag updated successfully"}, { status: 200 });
       },
     },
   },

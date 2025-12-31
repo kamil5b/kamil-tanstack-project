@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const ItemCreateSchema = z.object({
-  productId: z.uuid(),
   name: z.string(),
   quantity: z.number().min(0),
   unitQuantity: z.string(),

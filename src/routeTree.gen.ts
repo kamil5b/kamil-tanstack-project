@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIndexRouteImport } from './routes/product/index'
+import { Route as ApiTagIndexRouteImport } from './routes/api/tag/index'
 import { Route as ApiProductIndexRouteImport } from './routes/api/product/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ApiTagIdRouteImport } from './routes/api/tag/$id'
 import { Route as ApiProductIdRouteImport } from './routes/api/product/$id'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
@@ -29,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const ProductIndexRoute = ProductIndexRouteImport.update({
   id: '/product/',
   path: '/product/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTagIndexRoute = ApiTagIndexRouteImport.update({
+  id: '/api/tag/',
+  path: '/api/tag/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProductIndexRoute = ApiProductIndexRouteImport.update({
@@ -49,6 +56,11 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   id: '/demo/api/names',
   path: '/demo/api/names',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTagIdRoute = ApiTagIdRouteImport.update({
+  id: '/api/tag/$id',
+  path: '/api/tag/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProductIdRoute = ApiProductIdRouteImport.update({
@@ -81,10 +93,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/product': typeof ProductIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
+  '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/api/product': typeof ApiProductIndexRoute
+  '/api/tag': typeof ApiTagIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -94,10 +108,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/product': typeof ProductIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
+  '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/api/product': typeof ApiProductIndexRoute
+  '/api/tag': typeof ApiTagIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -108,10 +124,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/product/': typeof ProductIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
+  '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/api/product/': typeof ApiProductIndexRoute
+  '/api/tag/': typeof ApiTagIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -123,10 +141,12 @@ export interface FileRouteTypes {
     | '/'
     | '/product'
     | '/api/product/$id'
+    | '/api/tag/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/api/product'
+    | '/api/tag'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -136,10 +156,12 @@ export interface FileRouteTypes {
     | '/'
     | '/product'
     | '/api/product/$id'
+    | '/api/tag/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/api/product'
+    | '/api/tag'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -149,10 +171,12 @@ export interface FileRouteTypes {
     | '/'
     | '/product/'
     | '/api/product/$id'
+    | '/api/tag/$id'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/api/product/'
+    | '/api/tag/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -163,10 +187,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProductIndexRoute: typeof ProductIndexRoute
   ApiProductIdRoute: typeof ApiProductIdRoute
+  ApiTagIdRoute: typeof ApiTagIdRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   ApiProductIndexRoute: typeof ApiProductIndexRoute
+  ApiTagIndexRoute: typeof ApiTagIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -187,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/product'
       fullPath: '/product'
       preLoaderRoute: typeof ProductIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tag/': {
+      id: '/api/tag/'
+      path: '/api/tag'
+      fullPath: '/api/tag'
+      preLoaderRoute: typeof ApiTagIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/': {
@@ -215,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/api/names'
       fullPath: '/demo/api/names'
       preLoaderRoute: typeof DemoApiNamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tag/$id': {
+      id: '/api/tag/$id'
+      path: '/api/tag/$id'
+      fullPath: '/api/tag/$id'
+      preLoaderRoute: typeof ApiTagIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/$id': {
@@ -259,10 +299,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProductIndexRoute: ProductIndexRoute,
   ApiProductIdRoute: ApiProductIdRoute,
+  ApiTagIdRoute: ApiTagIdRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   ApiProductIndexRoute: ApiProductIndexRoute,
+  ApiTagIndexRoute: ApiTagIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

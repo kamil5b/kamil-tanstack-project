@@ -1,13 +1,19 @@
 import { Product } from "@/shared/entities/types/product";
 import { ProductResponse } from "@/shared/responses/types/product";
-import { InMemoryProductDB, InMemoryProductToTagDB } from "../../db/db.inmemory";
+import { InMemoryItemDB, InMemoryProductDB, InMemoryProductToTagDB } from "../../db/db.inmemory";
 
 export const InMemoryProductRepository = {
 	upsertProduct: async (e: Product): Promise<void> => {
+        InMemoryItemDB.deleteItemByProductId(e.id);
+        InMemoryProductToTagDB.removeTagFromProductId(e.id);
+        InMemoryProductToTagDB.bulkAddTagsToProduct(e.id, e.tags || []);
+        InMemoryItemDB.createBulkItems(e.items || [], e.id);
 		InMemoryProductDB.upsertProduct(e);
 	},
 
 	deleteProduct: async (id: string): Promise<void> => {
+        InMemoryItemDB.deleteItemByProductId(id);
+        InMemoryProductToTagDB.removeTagFromProductId(id);
 		InMemoryProductDB.deleteProduct(id);
 	},
 

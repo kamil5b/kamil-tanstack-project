@@ -1,5 +1,5 @@
 import { Tag } from "@/shared/entities/types/tag";
-import { InMemoryTagDB } from "../../db/db.inmemory";
+import { InMemoryProductToTagDB, InMemoryTagDB } from "../../db/db.inmemory";
 
 export const InMemoryTagRepository = {
 	upsertTag: async (e: Tag): Promise<void> => {
@@ -7,6 +7,7 @@ export const InMemoryTagRepository = {
 	},
 
 	deleteTag: async (id: string): Promise<void> => {
+        InMemoryProductToTagDB.removeProductFromTagId(id);
 		InMemoryTagDB.deleteTag(id);
 	},
 
