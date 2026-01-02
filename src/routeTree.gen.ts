@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TagIndexRouteImport } from './routes/tag/index'
 import { Route as ProductIndexRouteImport } from './routes/product/index'
+import { Route as ProductNewRouteImport } from './routes/product/new'
 import { Route as ApiTagIndexRouteImport } from './routes/api/tag/index'
 import { Route as ApiProductIndexRouteImport } from './routes/api/product/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -28,9 +30,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TagIndexRoute = TagIndexRouteImport.update({
+  id: '/tag/',
+  path: '/tag/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductIndexRoute = ProductIndexRouteImport.update({
   id: '/product/',
   path: '/product/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductNewRoute = ProductNewRouteImport.update({
+  id: '/product/new',
+  path: '/product/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTagIndexRoute = ApiTagIndexRouteImport.update({
@@ -91,7 +103,9 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/product/new': typeof ProductNewRoute
   '/product': typeof ProductIndexRoute
+  '/tag': typeof TagIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
   '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -106,7 +120,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/product/new': typeof ProductNewRoute
   '/product': typeof ProductIndexRoute
+  '/tag': typeof TagIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
   '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -122,7 +138,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/product/new': typeof ProductNewRoute
   '/product/': typeof ProductIndexRoute
+  '/tag/': typeof TagIndexRoute
   '/api/product/$id': typeof ApiProductIdRoute
   '/api/tag/$id': typeof ApiTagIdRoute
   '/demo/api/names': typeof DemoApiNamesRoute
@@ -139,7 +157,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/product/new'
     | '/product'
+    | '/tag'
     | '/api/product/$id'
     | '/api/tag/$id'
     | '/demo/api/names'
@@ -154,7 +174,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/product/new'
     | '/product'
+    | '/tag'
     | '/api/product/$id'
     | '/api/tag/$id'
     | '/demo/api/names'
@@ -169,7 +191,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/product/new'
     | '/product/'
+    | '/tag/'
     | '/api/product/$id'
     | '/api/tag/$id'
     | '/demo/api/names'
@@ -185,7 +209,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProductNewRoute: typeof ProductNewRoute
   ProductIndexRoute: typeof ProductIndexRoute
+  TagIndexRoute: typeof TagIndexRoute
   ApiProductIdRoute: typeof ApiProductIdRoute
   ApiTagIdRoute: typeof ApiTagIdRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
@@ -208,11 +234,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tag/': {
+      id: '/tag/'
+      path: '/tag'
+      fullPath: '/tag'
+      preLoaderRoute: typeof TagIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/': {
       id: '/product/'
       path: '/product'
       fullPath: '/product'
       preLoaderRoute: typeof ProductIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/new': {
+      id: '/product/new'
+      path: '/product/new'
+      fullPath: '/product/new'
+      preLoaderRoute: typeof ProductNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/tag/': {
@@ -297,7 +337,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProductNewRoute: ProductNewRoute,
   ProductIndexRoute: ProductIndexRoute,
+  TagIndexRoute: TagIndexRoute,
   ApiProductIdRoute: ApiProductIdRoute,
   ApiTagIdRoute: ApiTagIdRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
