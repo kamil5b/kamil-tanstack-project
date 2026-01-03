@@ -73,7 +73,7 @@ function RenderFields(props: {
   path?: string;
   asyncRegistry?: Record<string, AsyncSource>;
 }) {
-  const basePath = props.path ? props.path + "." : "";
+  const basePath = props.path ? `${props.path}.` : "";
 
   return (
     <>

@@ -21,31 +21,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/client/components/ui/sidebar";
+import { navData } from "../lib/nav";
 
 export default function AppSidebar({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const navData: {
-    title: string;
-    url: string;
-    isActive?: boolean;
-    items?: { title: string; url: string }[];
-  }[] = [
-    {
-      title: "Home",
-      url: "/",
-    },
-    {
-      title: "Products",
-      url: "/product",
-    },
-    {
-      title: "Tags",
-      url: "/tag",
-    },
-  ];
   return (
     <SidebarProvider>
       <Sidebar variant="sidebar" collapsible="icon">

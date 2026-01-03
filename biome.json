@@ -6,22 +6,27 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!src/routeTree.gen.ts",
-      "!!**/dist",
-      "!!**/.next",
-      "!!**/.output"
-    ]
+    "includes": ["**", "!src/routeTree.gen.ts", "!!**/dist"]
   },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space"
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "off"
+      }
     }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
   }
 }
