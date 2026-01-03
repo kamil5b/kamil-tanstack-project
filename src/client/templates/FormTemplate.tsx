@@ -243,7 +243,18 @@ function RenderFields(props: {
           const t = unwrap(fieldSchema);``
           const asyncKind = inferAsyncKind(name, fieldSchema);
           const source = props.asyncRegistry?.[name];
-
+		if (name === "id") {
+          return (
+            <Controller
+              key={fullName}
+              name={fullName}
+              control={props.control}
+              render={({ field }) => (
+                <input type="hidden" {...field} value={field.value ?? ""} />
+              )}
+            />
+          );
+        }
           // async select
           if (asyncKind === "single" && source) {
             return (

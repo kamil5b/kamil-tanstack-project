@@ -1,21 +1,34 @@
 import { FormTemplate } from '@/client/templates/FormTemplate'
 import { Tag } from '@/shared/entities/types/tag'
-import { CreateTagRequestSchema } from '@/shared/requests/schemas/tag'
+import { CreateTagRequestSchema, UpdateTagRequestSchema } from '@/shared/requests/schemas/tag'
 import { UpdateTagRequest, type CreateTagRequest } from '@/shared/requests/types/tag'
 
 export default function TagFormTemplate(props: {
 	initial?: Partial<Tag>
-	onSave: (data: CreateTagRequest) => void
+	onSave?: (data: CreateTagRequest) => void
 	onEdit?: (data: UpdateTagRequest) => void
 }) {
 	
-	// const schema = props.onEdit ? UpdateTagRequestSchema : CreateTagRequestSchema
-	// const { onSave, onEdit } = props
-	
+	const defaultValues = {
+    id: props.initial?.id,
+    name: props.initial?.name ?? "",
+    color: props.initial?.color,
+  };
+  if (props.initial) {
+	  return (
+		<FormTemplate
+		  schema={UpdateTagRequestSchema}
+		  // We wrap in a function to handle the case where onEdit is undefined
+		  onSubmit={(data) => props.onEdit?.(data)}
+		  defaultValues={defaultValues}
+		/>
+	  );
+	}
 	return (
 		<FormTemplate
 		schema={CreateTagRequestSchema}
-		onSubmit={props.onSave}
+		onSubmit={(data) => props.onSave?.(data)}
+		defaultValues={defaultValues}
 		/>
 	)
 }
