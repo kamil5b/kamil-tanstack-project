@@ -1,32 +1,31 @@
 import FormTemplate from '@/client/templates/FormTemplate'
-import { Product } from '@/shared/entities/types/product'
-import { CreateProductRequestSchema } from '@/shared/requests/schemas/product'
-import { UpdateProductRequest, type CreateProductRequest } from '@/shared/requests/types/product'
+import { Tag } from '@/shared/entities/types/tag'
+import { CreateTagRequestSchema } from '@/shared/requests/schemas/tag'
+import { UpdateTagRequest, type CreateTagRequest } from '@/shared/requests/types/tag'
 
-export default function ProductFormTemplate(props: {
-	initial?: Partial<Product>
-	onSave?: (data: CreateProductRequest) => void
-	onEdit?: (data: UpdateProductRequest) => void
+export default function TagFormTemplate(props: {
+	initial?: Partial<Tag>
+	onSave?: (data: CreateTagRequest) => void
+	onEdit?: (data: UpdateTagRequest) => void
 }) {
 	const { initial = {}, onSave, onEdit } = props
 
 	return (
 		<FormTemplate
-			title={initial?.name ? 'Edit Product' : 'Create Product'}
-			schema={CreateProductRequestSchema}
+			title={initial?.name ? 'Edit Tag' : 'Create Tag'}
+			schema={CreateTagRequestSchema}
 			initialValues={{
 				name: initial.name ?? '',
-				items: initial.items ?? [],
-				tags: initial.tags ?? [],
+				color: initial.color ?? ''
 			}}
 			onSubmit={(values) => {
-				// With schema-driven form the values are already structured according to CreateProductRequestSchema
+				// With schema-driven form the values are already structured according to CreateTagRequestSchema
 				if (values.id) {
-					onEdit?.(values as UpdateProductRequest)
+					onEdit?.(values as UpdateTagRequest)
 				} else {
-					onSave?.(values as CreateProductRequest)
+					onSave?.(values as CreateTagRequest)
 				}
-				console.log('save product', values)
+				console.log('save tag', values)
 			}}
 		/>
 	)

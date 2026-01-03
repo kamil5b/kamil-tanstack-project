@@ -12,6 +12,13 @@ export const getTagList = createServerFn({
     return await svc.tagSvc.listTag({ page: data.page, limit: data.limit });
 });
 
+export const getTagByID = createServerFn({
+    method: 'GET',
+}).inputValidator((d: string) => d).handler(async ({ data }) => {
+    const svc = initInjection();
+    return await svc.tagSvc.getTagByID(data);
+});
+
 export const createTag = createServerFn({
     method: 'POST',
 }).inputValidator(CreateTagRequestSchema).handler(async ({ data }) => {

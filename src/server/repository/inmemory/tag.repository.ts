@@ -21,5 +21,10 @@ export const InMemoryTagRepository = {
 		const slice = tags.slice(start, start + limit);
 		return { data: slice, total, page, limit };
 	},
+	getTagByID: async (id: string): Promise<Tag> => {
+		const tag = InMemoryTagDB.getTagById(id);
+		if (!tag) throw new Error("Tag not found");
+		return tag;
+	}
 };
 

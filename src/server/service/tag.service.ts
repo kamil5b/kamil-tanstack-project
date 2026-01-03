@@ -51,6 +51,10 @@ export class TagServiceImpl implements TagService {
         } as Tag;
         await this.repo.upsertTag(tag);
     }
+
+    async getTagByID(id: string): Promise<Tag> {
+        return await this.repo.getTagByID(id);
+    }
 }
 
 export const createTagService = (repo: TagRepository): TagService => new TagServiceImpl(repo);
