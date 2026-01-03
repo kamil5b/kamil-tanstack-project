@@ -4,8 +4,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import appCss from '../styles.css?url'
-import MainLayout from '@/client/layout/MainLayout'
-import Header from '@/client/components/Header'
+
 import AppSidebar from '@/client/components/Sidebar'
 
 export const Route = createRootRouteWithContext<{
@@ -21,7 +20,7 @@ export const Route = createRootRouteWithContext<{
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'TanStack Start - CRUD Starter by Kamil5b',
       },
     ],
     links: [

@@ -28,6 +28,7 @@ import {
 import { ScrollArea } from "@/client/components/ui/scroll-area";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { camelToCapitalSpaced } from "../lib/utils";
+import { useRouter } from "@tanstack/react-router";
 
 /* ============================================================
    Async registry
@@ -399,15 +400,20 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
     resolver: zodResolver(props.schema as any),
     defaultValues: props.defaultValues as any,
   });
+  const router = useRouter()
 
   return (
 	<div className="bg-white shadow rounded p-6">
     <form
-      className="space-y-6"
-      onSubmit={form.handleSubmit((v) =>
-        props.onSubmit(v as z.output<T>)
-      )}
-    >
+		className="space-y-6"
+		onSubmit={form.handleSubmit(async (v) => {
+			// 1. Wait for the submission to finish
+			await props.onSubmit(v as z.output<T>);
+			
+			// 2. Navigate back only after success
+			router.history.back();
+		})}
+		>
       <RenderFields
         schema={props.schema}
         control={form.control}
