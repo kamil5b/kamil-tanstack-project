@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { ProductSchema } from '../../entities/schemas/product';
-import { PaginationResponseSchema } from '../schemas/common';
-import { TagSchema } from '@/shared/entities/schemas/tag';
+import { z } from "zod";
+import { TagSchema } from "@/shared/entities/schemas/tag";
+import { ProductSchema } from "../../entities/schemas/product";
+import { PaginationResponseSchema } from "../schemas/common";
 
 export const ProductResponseSchema = ProductSchema.extend({
-    tags: z.array(TagSchema),
+  tags: z.array(TagSchema),
 });
 
 export const ProductsListResponseSchema = PaginationResponseSchema.extend({

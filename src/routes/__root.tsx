@@ -1,64 +1,66 @@
-import { HeadContent, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
-import appCss from '../styles.css?url'
-
-import AppSidebar from '@/client/components/Sidebar'
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import AppSidebar from "@/client/components/Sidebar";
+import appCss from "../styles.css?url";
 
 export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'TanStack Start - CRUD Starter by Kamil5b',
+        title: "TanStack Start - CRUD Starter by Kamil5b",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
   }),
 
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { queryClient } = Route.useRouteContext()
+  const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {/* <Header /> */}
-        <AppSidebar>{children}</AppSidebar>
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
+      <html lang="en">
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          {/* <Header /> */}
+          <AppSidebar>{children}</AppSidebar>
+          <TanStackDevtools
+            config={{
+              position: "bottom-right",
+            }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+          <Scripts />
+        </body>
+      </html>
     </QueryClientProvider>
-  )
+  );
 }

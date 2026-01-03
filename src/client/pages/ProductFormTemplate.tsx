@@ -1,16 +1,16 @@
 "use client";
 
+import type { AsyncSource } from "@/client/components/AsyncSelects";
 import { FormTemplate } from "@/client/templates/FormTemplate";
-import { AsyncSource } from "@/client/components/AsyncSelects";
 import { getTagList } from "@/server";
-import { Product } from "@/shared/entities/types/product";
+import type { Product } from "@/shared/entities/types/product";
 import {
   CreateProductRequestSchema,
   UpdateProductRequestSchema,
 } from "@/shared/requests/schemas/product";
-import {
+import type {
+  CreateProductRequest,
   UpdateProductRequest,
-  type CreateProductRequest,
 } from "@/shared/requests/types/product";
 
 export default function ProductFormTemplate(props: {

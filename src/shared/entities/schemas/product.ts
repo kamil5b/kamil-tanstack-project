@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { BaseEntitySchema } from './common';
+import { z } from "zod";
+import { BaseEntitySchema } from "./common";
 
 export const ItemSchema = BaseEntitySchema.extend({
   productId: z.uuid(),

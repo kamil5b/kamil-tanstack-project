@@ -1,19 +1,23 @@
 "use client";
 
-import { z } from "zod";
-import {
-  useForm,
-  Controller,
-  FieldValues,
-  useFieldArray,
-} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "@tanstack/react-router";
+import {
+  Controller,
+  type FieldValues,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Label } from "@/client/components/ui/label";
+import {
+  type AsyncSource,
+  InfiniteMultiSelect,
+  InfiniteSingleSelect,
+} from "../components/AsyncSelects";
 import { camelToCapitalSpaced } from "../lib/utils";
-import { useRouter } from "@tanstack/react-router";
-import { AsyncSource, InfiniteMultiSelect, InfiniteSingleSelect } from "../components/AsyncSelects";
 
 /* ============================================================
    Zod helpers (v4-safe)
@@ -44,7 +48,7 @@ function isUuid(type: unknown): boolean {
 
 function inferAsyncKind(
   name: string,
-  type: unknown
+  type: unknown,
 ): "single" | "multi" | null {
   const t = unwrap(type);
 
@@ -73,13 +77,13 @@ function RenderFields(props: {
 
   return (
     <>
-      {Object.entries(props.schema.shape).map(
-        ([name, fieldSchema]) => {
-          const fullName = `${basePath}${name}`;
-          const t = unwrap(fieldSchema);``
-          const asyncKind = inferAsyncKind(name, fieldSchema);
-          const source = props.asyncRegistry?.[name];
-		if (name === "id") {
+      {Object.entries(props.schema.shape).map(([name, fieldSchema]) => {
+        const fullName = `${basePath}${name}`;
+        const t = unwrap(fieldSchema);
+        ``;
+        const asyncKind = inferAsyncKind(name, fieldSchema);
+        const source = props.asyncRegistry?.[name];
+        if (name === "id") {
           return (
             <Controller
               key={fullName}
@@ -91,117 +95,8 @@ function RenderFields(props: {
             />
           );
         }
-          // async select
-          if (asyncKind === "single" && source) {
-            return (
-              <Controller
-                key={fullName}
-                name={fullName}
-                control={props.control}
-                render={({ field }) => (
-                  <>
-                    <Label>{camelToCapitalSpaced(name)}</Label>
-                    <InfiniteSingleSelect
-                      value={field.value}
-                      onChange={field.onChange}
-                      source={source}
-                      queryKey={fullName}
-                    />
-                  </>
-                )}
-              />
-            );
-          }
-
-          if (asyncKind === "multi" && source) {
-            return (
-              <Controller
-                key={fullName}
-                name={fullName}
-                control={props.control}
-                render={({ field }) => (
-                  <>
-                    <Label>{camelToCapitalSpaced(name)}</Label>
-                    <InfiniteMultiSelect
-                      value={field.value ?? []}
-                      onChange={field.onChange}
-                      source={source}
-                      queryKey={fullName}
-                    />
-                  </>
-                )}
-              />
-            );
-          }
-
-          // array(object)
-          if (t instanceof z.ZodArray) {
-            const el = unwrap(t.element);
-
-            if (el instanceof z.ZodObject) {
-              const { fields, append, remove } =
-                useFieldArray({
-                  control: props.control,
-                  name: fullName,
-                });
-
-              return (
-                <div
-                  key={fullName}
-                  className="space-y-4 border rounded p-4"
-                >
-                  <Label>{camelToCapitalSpaced(name)}</Label>
-
-                  {fields.map((f, i) => (
-                    <div
-                      key={f.id}
-                      className="space-y-3 border rounded p-3"
-                    >
-                      <RenderFields
-                        schema={el}
-                        control={props.control}
-                        path={`${fullName}.${i}`}
-                      />
-
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={() => remove(i)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-
-                  <Button
-                    type="button"
-                    onClick={() => append({})}
-                  >
-                    Add {name}
-                  </Button>
-                </div>
-              );
-            }
-          }
-
-          // nested object
-          if (t instanceof z.ZodObject) {
-            return (
-              <div
-                key={fullName}
-                className="space-y-4 border rounded p-4"
-              >
-                <Label>{camelToCapitalSpaced(name)}</Label>
-                <RenderFields
-                  schema={t}
-                  control={props.control}
-                  path={fullName}
-                />
-              </div>
-            );
-          }
-
-          // scalar
+        // async select
+        if (asyncKind === "single" && source) {
           return (
             <Controller
               key={fullName}
@@ -210,13 +105,108 @@ function RenderFields(props: {
               render={({ field }) => (
                 <>
                   <Label>{camelToCapitalSpaced(name)}</Label>
-                  <Input {...field} />
+                  <InfiniteSingleSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    source={source}
+                    queryKey={fullName}
+                  />
                 </>
               )}
             />
           );
         }
-      )}
+
+        if (asyncKind === "multi" && source) {
+          return (
+            <Controller
+              key={fullName}
+              name={fullName}
+              control={props.control}
+              render={({ field }) => (
+                <>
+                  <Label>{camelToCapitalSpaced(name)}</Label>
+                  <InfiniteMultiSelect
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    source={source}
+                    queryKey={fullName}
+                  />
+                </>
+              )}
+            />
+          );
+        }
+
+        // array(object)
+        if (t instanceof z.ZodArray) {
+          const el = unwrap(t.element);
+
+          if (el instanceof z.ZodObject) {
+            const { fields, append, remove } = useFieldArray({
+              control: props.control,
+              name: fullName,
+            });
+
+            return (
+              <div key={fullName} className="space-y-4 border rounded p-4">
+                <Label>{camelToCapitalSpaced(name)}</Label>
+
+                {fields.map((f, i) => (
+                  <div key={f.id} className="space-y-3 border rounded p-3">
+                    <RenderFields
+                      schema={el}
+                      control={props.control}
+                      path={`${fullName}.${i}`}
+                    />
+
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={() => remove(i)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+
+                <Button type="button" onClick={() => append({})}>
+                  Add {name}
+                </Button>
+              </div>
+            );
+          }
+        }
+
+        // nested object
+        if (t instanceof z.ZodObject) {
+          return (
+            <div key={fullName} className="space-y-4 border rounded p-4">
+              <Label>{camelToCapitalSpaced(name)}</Label>
+              <RenderFields
+                schema={t}
+                control={props.control}
+                path={fullName}
+              />
+            </div>
+          );
+        }
+
+        // scalar
+        return (
+          <Controller
+            key={fullName}
+            name={fullName}
+            control={props.control}
+            render={({ field }) => (
+              <>
+                <Label>{camelToCapitalSpaced(name)}</Label>
+                <Input {...field} />
+              </>
+            )}
+          />
+        );
+      })}
     </>
   );
 }
@@ -235,28 +225,28 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
     resolver: zodResolver(props.schema as any),
     defaultValues: props.defaultValues as any,
   });
-  const router = useRouter()
+  const router = useRouter();
 
   return (
-	<div className="bg-white shadow rounded p-6">
-    <form
-		className="space-y-6"
-		onSubmit={form.handleSubmit(async (v) => {
-			// 1. Wait for the submission to finish
-			await props.onSubmit(v as z.output<T>);
-			
-			// 2. Navigate back only after success
-			router.history.back();
-		})}
-		>
-      <RenderFields
-        schema={props.schema}
-        control={form.control}
-		asyncRegistry={props.asyncRegistry}
-      />
+    <div className="bg-white shadow rounded p-6">
+      <form
+        className="space-y-6"
+        onSubmit={form.handleSubmit(async (v) => {
+          // 1. Wait for the submission to finish
+          await props.onSubmit(v as z.output<T>);
 
-      <Button type="submit">Save</Button>
-    </form>
-	</div>
+          // 2. Navigate back only after success
+          router.history.back();
+        })}
+      >
+        <RenderFields
+          schema={props.schema}
+          control={form.control}
+          asyncRegistry={props.asyncRegistry}
+        />
+
+        <Button type="submit">Save</Button>
+      </form>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const ItemCreateSchema = z.object({
   name: z.string(),
@@ -14,6 +14,7 @@ export const CreateProductRequestSchema = z.object({
   tags: z.array(z.uuid()).default([]),
 });
 
-export const UpdateProductRequestSchema = CreateProductRequestSchema.partial().extend({
-  id: z.uuid(),
-});
+export const UpdateProductRequestSchema =
+  CreateProductRequestSchema.partial().extend({
+    id: z.uuid(),
+  });

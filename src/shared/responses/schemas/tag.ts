@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { TagSchema } from '../../entities/schemas/tag';
-import { PaginationResponseSchema } from '../schemas/common';
+import { z } from "zod";
+import { TagSchema } from "../../entities/schemas/tag";
+import { PaginationResponseSchema } from "../schemas/common";
 
 export const TagResponseSchema = TagSchema;
 
