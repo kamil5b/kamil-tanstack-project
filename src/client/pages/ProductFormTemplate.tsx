@@ -1,6 +1,7 @@
 "use client";
 
-import { FormTemplate, AsyncSource } from "@/client/templates/FormTemplate";
+import { FormTemplate } from "@/client/templates/FormTemplate";
+import { AsyncSource } from "@/client/components/AsyncSelects";
 import { getTagList } from "@/server";
 import { Product } from "@/shared/entities/types/product";
 import {
