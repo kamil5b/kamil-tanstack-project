@@ -34,6 +34,7 @@ export default function ProductList({ data, meta, onPageChange }: ProductsListRe
       data={rows}
       meta={paging}
       onPageChange={onPageChange}
+      createPageUrl="/product/new"
     />
   )
 }

@@ -16,6 +16,8 @@ import {
 	PaginationPrevious,
 	PaginationNext,
 } from '@/client/components/ui/pagination'
+import { Button } from '../components/ui/button'
+import { Link } from '@tanstack/react-router'
 
 type Column<T> = {
 	key: string
@@ -31,6 +33,7 @@ export default function PaginationListTemplate<T extends Record<string, any>>(pr
 	data: T[]
 	meta: { page: number; totalPages: number; limit: number; totalItems: number }
 	onPageChange?: (page: number) => void
+	createPageUrl?: string
 }) {
 	const { title, columns = [], itemSchema, columnOverrides = [], data, meta, onPageChange } = props
 
@@ -50,7 +53,14 @@ export default function PaginationListTemplate<T extends Record<string, any>>(pr
 
 	return (
 		<div className="bg-white shadow rounded p-4">
-			{title && <h2 className="text-lg font-medium mb-4">{title}</h2>}
+			<div className="flex items-center justify-between mb-4">
+				{title && <h2 className="text-lg font-medium">{title}</h2>}
+				{props.createPageUrl && (
+					<Button>
+						<Link to={props.createPageUrl}>Create</Link>
+					</Button>
+				)}
+			</div>
 
 			<Table>
 				<TableHeader>

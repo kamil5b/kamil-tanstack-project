@@ -27,6 +27,7 @@ import {
 } from "@/client/components/ui/command";
 import { ScrollArea } from "@/client/components/ui/scroll-area";
 import { Check, ChevronsUpDown } from "lucide-react";
+import { camelToCapitalSpaced } from "../lib/utils";
 
 /* ============================================================
    Async registry
@@ -252,7 +253,7 @@ function RenderFields(props: {
                 control={props.control}
                 render={({ field }) => (
                   <>
-                    <Label>{name}</Label>
+                    <Label>{camelToCapitalSpaced(name)}</Label>
                     <InfiniteSingleSelect
                       value={field.value}
                       onChange={field.onChange}
@@ -273,7 +274,7 @@ function RenderFields(props: {
                 control={props.control}
                 render={({ field }) => (
                   <>
-                    <Label>{name}</Label>
+                    <Label>{camelToCapitalSpaced(name)}</Label>
                     <InfiniteMultiSelect
                       value={field.value ?? []}
                       onChange={field.onChange}
@@ -302,7 +303,7 @@ function RenderFields(props: {
                   key={fullName}
                   className="space-y-4 border rounded p-4"
                 >
-                  <Label>{name}</Label>
+                  <Label>{camelToCapitalSpaced(name)}</Label>
 
                   {fields.map((f, i) => (
                     <div
@@ -343,7 +344,7 @@ function RenderFields(props: {
                 key={fullName}
                 className="space-y-4 border rounded p-4"
               >
-                <Label>{name}</Label>
+                <Label>{camelToCapitalSpaced(name)}</Label>
                 <RenderFields
                   schema={t}
                   control={props.control}
@@ -361,7 +362,7 @@ function RenderFields(props: {
               control={props.control}
               render={({ field }) => (
                 <>
-                  <Label>{name}</Label>
+                  <Label>{camelToCapitalSpaced(name)}</Label>
                   <Input {...field} />
                 </>
               )}
@@ -389,6 +390,7 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
   });
 
   return (
+	<div className="bg-white shadow rounded p-6">
     <form
       className="space-y-6"
       onSubmit={form.handleSubmit((v) =>
@@ -403,5 +405,6 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
 
       <Button type="submit">Save</Button>
     </form>
+	</div>
   );
 }

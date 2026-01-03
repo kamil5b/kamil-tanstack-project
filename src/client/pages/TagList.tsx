@@ -32,6 +32,7 @@ export default function TagList({ data, meta, onPageChange }: TagsListResponse &
       data={rows}
       meta={paging}
       onPageChange={onPageChange}
+      createPageUrl="/tag/new"
     />
   )
 }

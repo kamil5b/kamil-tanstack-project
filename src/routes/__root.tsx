@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import appCss from '../styles.css?url'
 import MainLayout from '@/client/layout/MainLayout'
+import Header from '@/client/components/Header'
+import AppSidebar from '@/client/components/Sidebar'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -42,7 +44,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <MainLayout>{children}</MainLayout>
+        {/* <Header /> */}
+        <AppSidebar>{children}</AppSidebar>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
