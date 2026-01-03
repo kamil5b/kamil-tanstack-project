@@ -32,8 +32,8 @@ import { Check, ChevronsUpDown } from "lucide-react";
    Async registry
    ============================================================ */
 
-type AsyncSource = {
-  fetcher: (input: { page: number; limit: number }) => Promise<{
+export type AsyncSource = {
+  fetcher: (data: { page: number; limit: number }) => Promise<{
     data: any[];
     meta: {
       page: number;
@@ -45,8 +45,6 @@ type AsyncSource = {
   getValue: (item: any) => string;
   getLabel: (item: any) => string;
 };
-
-export const asyncRegistry: Record<string, AsyncSource> = {};
 
 /* ============================================================
    Zod helpers (v4-safe)
@@ -70,11 +68,9 @@ function unwrap(type: unknown): z.ZodTypeAny {
 
 function isUuid(type: unknown): boolean {
   const t = unwrap(type);
-  if (!(t instanceof z.ZodString)) return false;
+  if (t instanceof z.ZodUUID) return true;
 
-  return Boolean(
-    t._def.checks?.some((c: any) => c.kind === "uuid")
-  );
+  return true;
 }
 
 function inferAsyncKind(
@@ -234,6 +230,7 @@ function RenderFields(props: {
   schema: z.ZodObject<any>;
   control: any;
   path?: string;
+  asyncRegistry?: Record<string, AsyncSource>;
 }) {
   const basePath = props.path ? props.path + "." : "";
 
@@ -242,9 +239,9 @@ function RenderFields(props: {
       {Object.entries(props.schema.shape).map(
         ([name, fieldSchema]) => {
           const fullName = `${basePath}${name}`;
-          const t = unwrap(fieldSchema);
+          const t = unwrap(fieldSchema);``
           const asyncKind = inferAsyncKind(name, fieldSchema);
-          const source = asyncRegistry[name];
+          const source = props.asyncRegistry?.[name];
 
           // async select
           if (asyncKind === "single" && source) {
@@ -384,6 +381,7 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
   schema: T;
   defaultValues?: Record<string, unknown>;
   onSubmit: (values: z.output<T>) => void;
+  asyncRegistry?: Record<string, AsyncSource>;
 }) {
   const form = useForm<FieldValues>({
     resolver: zodResolver(props.schema as any),
@@ -400,6 +398,7 @@ export function FormTemplate<T extends z.ZodObject<any>>(props: {
       <RenderFields
         schema={props.schema}
         control={form.control}
+		asyncRegistry={props.asyncRegistry}
       />
 
       <Button type="submit">Save</Button>
