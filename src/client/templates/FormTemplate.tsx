@@ -213,12 +213,14 @@ export default function FormTemplate(props: {
 									name={f.name as any}
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{label}</FormLabel>
+											{field.name !== "id" && <FormLabel>{label}</FormLabel>}
 											<FormControl>
 												{type === 'textarea' ? (
 													<Textarea {...field} placeholder={placeholder} />
 												) : (
-													<Input {...field} type={type === 'number' ? 'number' : 'text'} placeholder={placeholder} />
+													field.name === "id" ? 
+													<Input {...field} type={type === 'number' ? 'number' : 'text'} hidden placeholder={placeholder} /> :
+													<Input {...field} type={type === 'number' ? 'number' : 'text'} placeholder={placeholder} /> 
 												)}
 											</FormControl>
 											<FormMessage />

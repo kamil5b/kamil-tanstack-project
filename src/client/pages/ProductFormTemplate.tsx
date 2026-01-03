@@ -1,6 +1,6 @@
 import FormTemplate from '@/client/templates/FormTemplate'
 import { Product } from '@/shared/entities/types/product'
-import { CreateProductRequestSchema } from '@/shared/requests/schemas/product'
+import { CreateProductRequestSchema, UpdateProductRequestSchema } from '@/shared/requests/schemas/product'
 import { UpdateProductRequest, type CreateProductRequest } from '@/shared/requests/types/product'
 
 export default function ProductFormTemplate(props: {
@@ -13,8 +13,9 @@ export default function ProductFormTemplate(props: {
 	return (
 		<FormTemplate
 			title={initial?.name ? 'Edit Product' : 'Create Product'}
-			schema={CreateProductRequestSchema}
+			schema={onEdit ? UpdateProductRequestSchema : CreateProductRequestSchema}
 			initialValues={{
+				id: initial.id,
 				name: initial.name ?? '',
 				items: initial.items ?? [],
 				tags: initial.tags ?? [],
@@ -27,6 +28,7 @@ export default function ProductFormTemplate(props: {
 					onSave?.(values as CreateProductRequest)
 				}
 				console.log('save product', values)
+				window.location.href = '/product'; // Redirect to products list after save
 			}}
 		/>
 	)

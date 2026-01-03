@@ -18,14 +18,9 @@ function RouteComponent() {
       void alert('Failed to save tag')
     }
   }
-
   const initialData = Route.useLoaderData()
 
-  // Map tag objects to string names for the form template
-  const initialForForm = {
-    ...initialData,
-    tags: initialData.tags?.map((tag: { name: string }) => tag.name) ?? [],
-  }
+  console.log('Initial tag data:', initialData)
 
-  return <TagFormTemplate initial={initialForForm} onEdit={handleSave} />
+  return <TagFormTemplate initial={initialData} onEdit={handleSave} />
 }
