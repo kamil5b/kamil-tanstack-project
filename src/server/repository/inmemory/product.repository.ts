@@ -39,8 +39,10 @@ export const InMemoryProductRepository = {
 
 		const data: ProductResponse[] = slice.map((p) => {
 			const tags = InMemoryProductToTagDB.getTagsForProduct(p.id);
+			const items = InMemoryItemDB.getItemsByProductId(p.id);
 			return {
 				...p,
+				items,
 				tags,
 			} as ProductResponse;
 		});

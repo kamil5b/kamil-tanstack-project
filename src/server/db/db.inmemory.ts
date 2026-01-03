@@ -16,14 +16,14 @@ const tableProducts: TProduct[] = [
     {
         id: "prod-1",
         name: "Red T-Shirt",
-        totalPrice: 19.99,
+        totalPrice: 299.85+199.9,
         createdAt: new Date(),
         updatedAt: new Date(),
     },
     {
         id: "prod-2",
         name: "Blue Jeans",
-        totalPrice: 49.99,
+        totalPrice: 249.95,
         createdAt: new Date(),
         updatedAt: new Date(),
     },

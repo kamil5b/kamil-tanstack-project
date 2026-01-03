@@ -19,5 +19,13 @@ function RouteComponent() {
     }
   }
 
-  return <ProductFormTemplate onSave={handleSave} />
+  const initialData = Route.useLoaderData()
+
+  // Map tag objects to string names for the form template
+  const initialForForm = {
+    ...initialData,
+    tags: initialData.tags?.map((tag: { name: string }) => tag.name) ?? [],
+  }
+
+  return <ProductFormTemplate initial={initialForForm} onEdit={handleSave} />
 }

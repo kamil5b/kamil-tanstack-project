@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagIndexRouteImport } from './routes/tag/index'
 import { Route as ProductIndexRouteImport } from './routes/product/index'
+import { Route as TagNewRouteImport } from './routes/tag/new'
 import { Route as ProductNewRouteImport } from './routes/product/new'
+import { Route as TagEditIdRouteImport } from './routes/tag/edit/$id'
 import { Route as ProductEditIdRouteImport } from './routes/product/edit/$id'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -37,9 +39,19 @@ const ProductIndexRoute = ProductIndexRouteImport.update({
   path: '/product/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TagNewRoute = TagNewRouteImport.update({
+  id: '/tag/new',
+  path: '/tag/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductNewRoute = ProductNewRouteImport.update({
   id: '/product/new',
   path: '/product/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TagEditIdRoute = TagEditIdRouteImport.update({
+  id: '/tag/edit/$id',
+  path: '/tag/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductEditIdRoute = ProductEditIdRouteImport.update({
@@ -86,12 +98,14 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/product/new': typeof ProductNewRoute
+  '/tag/new': typeof TagNewRoute
   '/product': typeof ProductIndexRoute
   '/tag': typeof TagIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/product/edit/$id': typeof ProductEditIdRoute
+  '/tag/edit/$id': typeof TagEditIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -100,12 +114,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/product/new': typeof ProductNewRoute
+  '/tag/new': typeof TagNewRoute
   '/product': typeof ProductIndexRoute
   '/tag': typeof TagIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/product/edit/$id': typeof ProductEditIdRoute
+  '/tag/edit/$id': typeof TagEditIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -115,12 +131,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/product/new': typeof ProductNewRoute
+  '/tag/new': typeof TagNewRoute
   '/product/': typeof ProductIndexRoute
   '/tag/': typeof TagIndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/product/edit/$id': typeof ProductEditIdRoute
+  '/tag/edit/$id': typeof TagEditIdRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -131,12 +149,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/product/new'
+    | '/tag/new'
     | '/product'
     | '/tag'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/product/edit/$id'
+    | '/tag/edit/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -145,12 +165,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/product/new'
+    | '/tag/new'
     | '/product'
     | '/tag'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/product/edit/$id'
+    | '/tag/edit/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -159,12 +181,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/product/new'
+    | '/tag/new'
     | '/product/'
     | '/tag/'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
     | '/product/edit/$id'
+    | '/tag/edit/$id'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -174,12 +198,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProductNewRoute: typeof ProductNewRoute
+  TagNewRoute: typeof TagNewRoute
   ProductIndexRoute: typeof ProductIndexRoute
   TagIndexRoute: typeof TagIndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   ProductEditIdRoute: typeof ProductEditIdRoute
+  TagEditIdRoute: typeof TagEditIdRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -209,11 +235,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tag/new': {
+      id: '/tag/new'
+      path: '/tag/new'
+      fullPath: '/tag/new'
+      preLoaderRoute: typeof TagNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/new': {
       id: '/product/new'
       path: '/product/new'
       fullPath: '/product/new'
       preLoaderRoute: typeof ProductNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tag/edit/$id': {
+      id: '/tag/edit/$id'
+      path: '/tag/edit/$id'
+      fullPath: '/tag/edit/$id'
+      preLoaderRoute: typeof TagEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/edit/$id': {
@@ -278,12 +318,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProductNewRoute: ProductNewRoute,
+  TagNewRoute: TagNewRoute,
   ProductIndexRoute: ProductIndexRoute,
   TagIndexRoute: TagIndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   ProductEditIdRoute: ProductEditIdRoute,
+  TagEditIdRoute: TagEditIdRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

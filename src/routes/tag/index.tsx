@@ -1,12 +1,31 @@
 import { createFileRoute } from '@tanstack/react-router'
+import TagList from '@/client/pages/TagList'
+import { PaginationRequestSchema } from '@/shared/requests/schemas/common'
+import { getTagList } from '@/server'
 
 export const Route = createFileRoute('/tag/')({
   component: RouteComponent,
-  loader: async () => {
-    return await fetch('/api/tag/').then(res => res.json());
+  validateSearch: PaginationRequestSchema,
+  loaderDeps: ({ search: { page, limit } }) => ({ page, limit }),
+  loader: async ({ deps }) => {
+    return await getTagList({ data: deps })
   }
 })
 
 function RouteComponent() {
-  return <div>Hello "/tag/"!</div>
+  
+  const navigate = Route.useNavigate()
+  const loaderData = Route.useLoaderData() 
+  
+  const data = loaderData?.data ?? []
+  const meta = loaderData?.meta ?? { page: 1, totalPages: 1, limit: 10, totalItems: 0 }
+
+  function onPageChange(page: number) {
+    // 3. Simplified navigation
+    navigate({ 
+      search: (prev) => ({ ...prev, page }) 
+    })
+  }
+
+  return <TagList data={data} meta={meta} onPageChange={onPageChange} />
 }

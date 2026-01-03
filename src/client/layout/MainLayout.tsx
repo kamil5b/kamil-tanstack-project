@@ -15,6 +15,13 @@ import {
 	SidebarInset,
 } from '@/client/components/ui/sidebar'
 
+const NAVIGATIONS = [
+	{ to: '/product', label: 'Products' },
+	{ to: '/product/new', label: 'Create Product' },
+	{ to: '/tag', label: 'Tags' },
+	{ to: '/tag/new', label: 'Create Tag' },
+]
+
 export default function MainLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<SidebarProvider>
@@ -32,29 +39,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 								<SidebarGroup>
 									<SidebarGroupLabel>Management</SidebarGroupLabel>
 									<SidebarMenu>
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<Link to="/product">Products</Link>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<Link to="/product/create">Create Product</Link>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<Link to="/tag">Tags</Link>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-
-										<SidebarMenuItem>
-											<SidebarMenuButton asChild>
-												<Link to="/tag/create">Create Tag</Link>
-											</SidebarMenuButton>
-										</SidebarMenuItem>
+										{NAVIGATIONS.map((nav) => (
+											<SidebarMenuItem key={nav.to}>
+												<SidebarMenuButton asChild>
+													<Link to={nav.to}>{nav.label}</Link>
+												</SidebarMenuButton>
+											</SidebarMenuItem>
+										))}
 									</SidebarMenu>
 								</SidebarGroup>
 							</SidebarContent>
