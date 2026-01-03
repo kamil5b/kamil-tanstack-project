@@ -1,22 +1,30 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import ProductList from '@/client/pages/ProductList'
-import { PaginationRequest } from '@/shared/requests/types/common'
+import { PaginationRequestSchema } from '@/shared/requests/schemas/common'
+import { getProductList } from '@/server'
 
 export const Route = createFileRoute('/product/')({
   component: RouteComponent,
-  loader: async () => {
-    return await fetch(`${process.env.PUBLIC_URL || 'http://localhost:3000'}/api/product`).then((res) => res.json())
-  },
+  validateSearch: PaginationRequestSchema,
+  loaderDeps: ({ search: { page, limit } }) => ({ page, limit }),
+  loader: async ({ deps }) => {
+    return await getProductList({ data: deps })
+  }
 })
 
 function RouteComponent() {
-  const router = useRouter()
-  const loaderData = Route.useLoaderData() as any
+  
+  const navigate = Route.useNavigate()
+  const loaderData = Route.useLoaderData() 
+  
   const data = loaderData?.data ?? []
   const meta = loaderData?.meta ?? { page: 1, totalPages: 1, limit: 10, totalItems: 0 }
 
   function onPageChange(page: number) {
-    router.navigate({ to:'/product/', search: (s: PaginationRequest) => ({ ...(s??{limit: meta.limit}), page }) })
+    // 3. Simplified navigation
+    navigate({ 
+      search: (prev) => ({ ...prev, page }) 
+    })
   }
 
   return <ProductList data={data} meta={meta} onPageChange={onPageChange} />

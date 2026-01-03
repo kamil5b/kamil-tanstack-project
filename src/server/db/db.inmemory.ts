@@ -10,11 +10,82 @@ type TProductToTag = {
 type TProduct = Omit<Product, 'tags' | 'items'>;
 type TItem = Item;
 type TTag = Tag;
+// In-memory tables populated with some example data
 
-const tableProducts: TProduct[] = [];
-const tableItems: TItem[] = [];
-const tableTags: TTag[] = [];
-const tableTProductToTags: TProductToTag[] = [];
+const tableProducts: TProduct[] = [
+    {
+        id: "prod-1",
+        name: "Red T-Shirt",
+        totalPrice: 19.99,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: "prod-2",
+        name: "Blue Jeans",
+        totalPrice: 49.99,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];
+const tableItems: TItem[] = [
+    {
+        id: "item-1",
+        productId: "prod-1",
+        name: "REDTSHIRT-S",
+        quantity: 10,
+        unitQuantity: "1",
+        unitPrice: 19.99,
+        totalPrice: 199.9,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: "item-2",
+        productId: "prod-1",
+        name: "REDTSHIRT-M",
+        quantity: 15,
+        unitQuantity: "1",
+        unitPrice: 19.99,
+        totalPrice: 299.85,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: "item-3",
+        productId: "prod-2",
+        name: "BLUEJEANS-32",
+        quantity: 5,
+        unitQuantity: "1",
+        unitPrice: 49.99,
+        totalPrice: 249.95,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];
+
+const tableTags: TTag[] = [
+    {
+        id: "tag-1",
+        name: "Summer",
+        color: "#FFD700",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: "tag-2",
+        name: "Sale",
+        color: "#FF6347",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];
+
+const tableTProductToTags: TProductToTag[] = [
+    { productId: "prod-1", tagId: "tag-1" },
+    { productId: "prod-1", tagId: "tag-2" },
+    { productId: "prod-2", tagId: "tag-2" },
+];
 
 export const InMemoryProductDB = {
     getProducts: (): TProduct[] => {

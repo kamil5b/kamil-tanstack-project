@@ -1,10 +1,10 @@
 import FormTemplate from '@/client/templates/FormTemplate'
 import { CreateProductRequestSchema } from '@/shared/requests/schemas/product'
-import { type CreateProductRequest } from '@/shared/requests/types/product'
+import { UpdateProductRequest, type CreateProductRequest } from '@/shared/requests/types/product'
 
 export default function ProductFormTemplate(props: {
 	initial?: Partial<CreateProductRequest>
-	onSave?: (data: CreateProductRequest) => void
+	onSave?: (data: CreateProductRequest | UpdateProductRequest) => void
 }) {
 	const { initial = {}, onSave } = props
 

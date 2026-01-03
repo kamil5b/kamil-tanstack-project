@@ -24,7 +24,7 @@ export default function ProductList({ data, meta, onPageChange }: ProductsListRe
           </div>
         )
     } },
-    { key: 'actions', header: 'Actions', render: (r: ProductResponse) => <Link to={`/product/${r.id}`}>Edit</Link> },
+    { key: 'actions', header: 'Actions', render: (r: ProductResponse) => <Link to={`/product/edit/${r.id}`}>Edit</Link> },
   ]
   return (
     <PaginationListTemplate

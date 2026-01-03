@@ -17,6 +17,17 @@ export const InMemoryProductRepository = {
 		InMemoryProductDB.deleteProduct(id);
 	},
 
+	getProductById: async (id: string): Promise<ProductResponse> => {
+		const product = InMemoryProductDB.getProductById(id);
+		if (!product) throw new Error("Product not found");
+
+		const tags = InMemoryProductToTagDB.getTagsForProduct(product.id);
+		return {
+			...product,
+			tags,
+		} as ProductResponse;
+	},
+
 	productPagination: async (
 		page: number,
 		limit: number

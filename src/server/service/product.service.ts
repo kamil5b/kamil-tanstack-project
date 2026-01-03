@@ -1,7 +1,7 @@
 import { Product } from "@/shared/entities/types/product";
 import { PaginationRequest } from "@/shared/requests/types/common";
 import { CreateProductRequest, ItemCreate, UpdateProductRequest } from "@/shared/requests/types/product";
-import { ProductsListResponse } from "@/shared/responses/types/product";
+import { ProductResponse, ProductsListResponse } from "@/shared/responses/types/product";
 import { ProductService, ProductRepository } from "@/server/interfaces/product.interface";
 
 export class ProductServiceImpl implements ProductService {
@@ -20,6 +20,9 @@ export class ProductServiceImpl implements ProductService {
                 totalPages: Math.ceil(result.total / result.limit),
             },
         };  
+    }
+    async getProductById(id: string): Promise<ProductResponse> {
+        return await this.repo.getProductById(id);
     }
 
     async createProduct(req: CreateProductRequest): Promise<void> {
