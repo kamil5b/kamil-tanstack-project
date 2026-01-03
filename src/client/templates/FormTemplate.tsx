@@ -1,244 +1,408 @@
-import React from 'react'
-import { ZodTypeAny } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+"use client";
 
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/client/components/ui/form'
-import { Input } from '@/client/components/ui/input'
-import { Textarea } from '@/client/components/ui/textarea'
-import { Button } from '@/client/components/ui/button'
+import * as React from "react";
+import { z } from "zod";
+import {
+  useForm,
+  Controller,
+  FieldValues,
+  useFieldArray,
+} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-type FieldOverride = {
-	name: string
-	label?: string
-	placeholder?: string
-	type?: 'text' | 'number' | 'textarea'
+import { Button } from "@/client/components/ui/button";
+import { Input } from "@/client/components/ui/input";
+import { Label } from "@/client/components/ui/label";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/client/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/client/components/ui/command";
+import { ScrollArea } from "@/client/components/ui/scroll-area";
+import { Check, ChevronsUpDown } from "lucide-react";
+
+/* ============================================================
+   Async registry
+   ============================================================ */
+
+type AsyncSource = {
+  fetcher: (input: { page: number; limit: number }) => Promise<{
+    data: any[];
+    meta: {
+      page: number;
+      totalPages: number;
+      limit: number;
+      totalItems: number;
+    };
+  }>;
+  getValue: (item: any) => string;
+  getLabel: (item: any) => string;
+};
+
+export const asyncRegistry: Record<string, AsyncSource> = {};
+
+/* ============================================================
+   Zod helpers (v4-safe)
+   ============================================================ */
+
+function unwrap(type: unknown): z.ZodTypeAny {
+  let t: any = type;
+
+  while (
+    t &&
+    typeof t === "object" &&
+    (t instanceof z.ZodOptional ||
+      t instanceof z.ZodNullable ||
+      t instanceof z.ZodDefault)
+  ) {
+    t = t._def.innerType;
+  }
+
+  return t as z.ZodTypeAny;
 }
 
-export default function FormTemplate(props: {
-	title?: string
-	schema?: ZodTypeAny
-	fieldOverrides?: FieldOverride[]
-	initialValues?: Record<string, any>
-	onSubmit: (values: Record<string, any>) => void
+function isUuid(type: unknown): boolean {
+  const t = unwrap(type);
+  if (!(t instanceof z.ZodString)) return false;
+
+  return Boolean(
+    t._def.checks?.some((c: any) => c.kind === "uuid")
+  );
+}
+
+function inferAsyncKind(
+  name: string,
+  type: unknown
+): "single" | "multi" | null {
+  const t = unwrap(type);
+
+  if (t instanceof z.ZodArray && isUuid(t.element)) {
+    return "multi";
+  }
+
+  if (isUuid(t) && name !== "id") {
+    return "single";
+  }
+
+  return null;
+}
+
+/* ============================================================
+   Async Selects
+   ============================================================ */
+
+function InfiniteSingleSelect(props: {
+  value?: string;
+  onChange: (v: string) => void;
+  source: AsyncSource;
+  queryKey: string;
 }) {
-	const { schema, fieldOverrides = [], initialValues = {}, onSubmit, title } = props
+  const q = useInfiniteQuery({
+    queryKey: [props.queryKey],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      props.source.fetcher({ page: pageParam, limit: 20 }),
+    getNextPageParam: (last) =>
+      last.meta.page < last.meta.totalPages
+        ? last.meta.page + 1
+        : undefined,
+  });
 
-	// useForm with `any` to avoid complex generic constraints between zod and react-hook-form
-	const form = useForm<any>({
-		resolver: schema ? zodResolver(schema as any) : undefined,
-		defaultValues: initialValues,
-		mode: 'onSubmit',
-	})
+  const items = q.data?.pages.flatMap((p) => p.data) ?? [];
 
-	function getOverride(name: string) {
-		return fieldOverrides.find((f) => f.name === name)
-	}
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between">
+          {props.value ?? "Select"}
+          <ChevronsUpDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
 
-	function resolveShape(schemaObj: any) {
-		const maybeShape = schemaObj?._def?.shape ?? schemaObj?._def?.schema
-		if (typeof maybeShape === 'function') return maybeShape()
-		return maybeShape || {}
-	}
+      <PopoverContent className="p-0 w-full">
+        <Command>
+          <CommandInput placeholder="Search…" />
+          <CommandList>
+            <ScrollArea className="h-64">
+              {items.map((item) => {
+                const id = props.source.getValue(item);
+                return (
+                  <CommandItem
+                    key={id}
+                    onSelect={() => props.onChange(id)}
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${
+                        props.value === id
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    />
+                    {props.source.getLabel(item)}
+                  </CommandItem>
+                );
+              })}
+            </ScrollArea>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
-	// derive fields from zod schema when provided
-	const fields = React.useMemo(() => {
-		if (!schema) return [] as FieldOverride[]
-		const shape = resolveShape(schema as any)
-		return Object.keys(shape).map((k) => ({ name: k }))
-	}, [schema])
+function InfiniteMultiSelect(props: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  source: AsyncSource;
+  queryKey: string;
+}) {
+  const q = useInfiniteQuery({
+    queryKey: [props.queryKey],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      props.source.fetcher({ page: pageParam, limit: 20 }),
+    getNextPageParam: (last) =>
+      last.meta.page < last.meta.totalPages
+        ? last.meta.page + 1
+        : undefined,
+  });
 
-	// Recursive renderer to support nested objects and arrays
-	function renderFieldRecursive(name: string, schemaPart: any): React.ReactNode {
-		const typeName = schemaPart?._def?.typeName
+  const items = q.data?.pages.flatMap((p) => p.data) ?? [];
 
-		// Arrays
-		if (typeName === 'ZodArray') {
-			const itemType = schemaPart._def.type
-			const arr: any[] = form.watch(name) ?? []
+  const toggle = (id: string) => {
+    props.onChange(
+      props.value.includes(id)
+        ? props.value.filter((v) => v !== id)
+        : [...props.value, id]
+    );
+  };
 
-			return (
-				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<div className="text-sm font-medium">{name}</div>
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => {
-								const defaultVal = itemType._def?.typeName === 'ZodObject' ? {} : ''
-								form.setValue(name, [...(arr || []), defaultVal])
-							}}
-						>
-							Add
-						</Button>
-					</div>
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between">
+          {props.value.length
+            ? `${props.value.length} selected`
+            : "Select"}
+          <ChevronsUpDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
 
-					<div className="space-y-2">
-						{(arr || []).map((_, idx) => (
-							<div key={idx} className="p-2 border rounded">
-								{itemType._def?.typeName === 'ZodObject' ? (
-									Object.keys(resolveShape(itemType)).map((k) => (
-										<FormField
-											key={k}
-											control={form.control}
-											name={`${name}.${idx}.${k}` as any}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>{k}</FormLabel>
-													<FormControl>
-														<Input {...field} />
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-									))
-								) : (
-									<FormField
-										control={form.control}
-										name={`${name}.${idx}` as any}
-										render={({ field }) => (
-											<FormItem>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								)}
+      <PopoverContent className="p-0 w-full">
+        <Command>
+          <CommandInput placeholder="Search…" />
+          <CommandList>
+            <ScrollArea className="h-64">
+              {items.map((item) => {
+                const id = props.source.getValue(item);
+                return (
+                  <CommandItem
+                    key={id}
+                    onSelect={() => toggle(id)}
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${
+                        props.value.includes(id)
+                          ? "opacity-100"
+                          : "opacity-0"
+                      }`}
+                    />
+                    {props.source.getLabel(item)}
+                  </CommandItem>
+                );
+              })}
+            </ScrollArea>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
-								<div className="mt-2">
-									<Button
-										type="button"
-										variant="destructive"
-										onClick={() => {
-											const current = form.getValues()[name] || []
-											const next = current.filter((_: any, i: number) => i !== idx)
-											form.setValue(name, next)
-										}}
-									>
-										Remove
-									</Button>
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			)
-		}
+/* ============================================================
+   Recursive field renderer
+   ============================================================ */
 
-		// Objects
-		if (typeName === 'ZodObject') {
-			const shape = resolveShape(schemaPart as any)
-			return (
-				<div className="p-2 border rounded space-y-2">
-					<div className="text-sm font-medium">{name}</div>
-					{Object.keys(shape).map((k) => (
-						<FormField
-							key={k}
-							control={form.control}
-							name={`${name}.${k}` as any}
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{k}</FormLabel>
-									<FormControl>
-										<Input {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-					))}
-				</div>
-			)
-		}
+function RenderFields(props: {
+  schema: z.ZodObject<any>;
+  control: any;
+  path?: string;
+}) {
+  const basePath = props.path ? props.path + "." : "";
 
-		// Fallback primitive
-		return (
-			<FormField
-				control={form.control}
-				name={name as any}
-				render={({ field }) => (
-					<FormItem>
-						<FormControl>
-							<Input {...field} />
-						</FormControl>
-						<FormMessage />
-					</FormItem>
-				)}
-			/>
-		)
-	}
+  return (
+    <>
+      {Object.entries(props.schema.shape).map(
+        ([name, fieldSchema]) => {
+          const fullName = `${basePath}${name}`;
+          const t = unwrap(fieldSchema);
+          const asyncKind = inferAsyncKind(name, fieldSchema);
+          const source = asyncRegistry[name];
 
-	return (
-		<div className="bg-white shadow rounded p-6">
-			{title && <h2 className="text-lg font-medium mb-4">{title}</h2>}
+          // async select
+          if (asyncKind === "single" && source) {
+            return (
+              <Controller
+                key={fullName}
+                name={fullName}
+                control={props.control}
+                render={({ field }) => (
+                  <>
+                    <Label>{name}</Label>
+                    <InfiniteSingleSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      source={source}
+                      queryKey={fullName}
+                    />
+                  </>
+                )}
+              />
+            );
+          }
 
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit((values) => onSubmit(values))}
-					className="space-y-4"
-				>
-					{(() => {
-						const schemaShape = resolveShape(schema as any)
-						return fields.map((f) => {
-							const override = getOverride(f.name)
-							// attempt to detect type from schema
-							let detected: FieldOverride['type'] = 'text'
-							try {
-								const s = schemaShape?.[f.name]
-								if (s && s._def?.typeName === 'ZodNumber') detected = 'number'
-								if (s && s._def?.typeName === 'ZodArray') detected = 'textarea'
-							} catch (e) {}
+          if (asyncKind === "multi" && source) {
+            return (
+              <Controller
+                key={fullName}
+                name={fullName}
+                control={props.control}
+                render={({ field }) => (
+                  <>
+                    <Label>{name}</Label>
+                    <InfiniteMultiSelect
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      source={source}
+                      queryKey={fullName}
+                    />
+                  </>
+                )}
+              />
+            );
+          }
 
-							const type = override?.type ?? detected
-							const label = override?.label ?? f.name
-							const placeholder = override?.placeholder ?? ''
+          // array(object)
+          if (t instanceof z.ZodArray) {
+            const el = unwrap(t.element);
 
-							const s = schemaShape?.[f.name]
-							if (s && (s._def?.typeName === 'ZodObject' || s._def?.typeName === 'ZodArray')) {
-								return (
-									<div key={f.name}>
-										{renderFieldRecursive(f.name, s)}
-									</div>
-								)
-							}
+            if (el instanceof z.ZodObject) {
+              const { fields, append, remove } =
+                useFieldArray({
+                  control: props.control,
+                  name: fullName,
+                });
 
-							// primitive fallback
-							return (
-								<FormField
-									key={f.name}
-									control={form.control}
-									name={f.name as any}
-									render={({ field }) => (
-										<FormItem>
-											{field.name !== "id" && <FormLabel>{label}</FormLabel>}
-											<FormControl>
-												{type === 'textarea' ? (
-													<Textarea {...field} placeholder={placeholder} />
-												) : (
-													field.name === "id" ? 
-													<Input {...field} type={type === 'number' ? 'number' : 'text'} hidden placeholder={placeholder} /> :
-													<Input {...field} type={type === 'number' ? 'number' : 'text'} placeholder={placeholder} /> 
-												)}
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							)
-						})
-					})()}
+              return (
+                <div
+                  key={fullName}
+                  className="space-y-4 border rounded p-4"
+                >
+                  <Label>{name}</Label>
 
-					<div className="flex gap-2">
-						<Button type="submit">Save</Button>
-						<Button variant="outline" type="button" onClick={() => form.reset(initialValues)}>
-							Reset
-						</Button>
-					</div>
-				</form>
-			</Form>
-		</div>
-	)
+                  {fields.map((f, i) => (
+                    <div
+                      key={f.id}
+                      className="space-y-3 border rounded p-3"
+                    >
+                      <RenderFields
+                        schema={el}
+                        control={props.control}
+                        path={`${fullName}.${i}`}
+                      />
+
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => remove(i)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+
+                  <Button
+                    type="button"
+                    onClick={() => append({})}
+                  >
+                    Add {name}
+                  </Button>
+                </div>
+              );
+            }
+          }
+
+          // nested object
+          if (t instanceof z.ZodObject) {
+            return (
+              <div
+                key={fullName}
+                className="space-y-4 border rounded p-4"
+              >
+                <Label>{name}</Label>
+                <RenderFields
+                  schema={t}
+                  control={props.control}
+                  path={fullName}
+                />
+              </div>
+            );
+          }
+
+          // scalar
+          return (
+            <Controller
+              key={fullName}
+              name={fullName}
+              control={props.control}
+              render={({ field }) => (
+                <>
+                  <Label>{name}</Label>
+                  <Input {...field} />
+                </>
+              )}
+            />
+          );
+        }
+      )}
+    </>
+  );
+}
+
+/* ============================================================
+   FormTemplate
+   ============================================================ */
+
+export function FormTemplate<T extends z.ZodObject<any>>(props: {
+  schema: T;
+  defaultValues?: Record<string, unknown>;
+  onSubmit: (values: z.output<T>) => void;
+}) {
+  const form = useForm<FieldValues>({
+    resolver: zodResolver(props.schema as any),
+    defaultValues: props.defaultValues as any,
+  });
+
+  return (
+    <form
+      className="space-y-6"
+      onSubmit={form.handleSubmit((v) =>
+        props.onSubmit(v as z.output<T>)
+      )}
+    >
+      <RenderFields
+        schema={props.schema}
+        control={form.control}
+      />
+
+      <Button type="submit">Save</Button>
+    </form>
+  );
 }
