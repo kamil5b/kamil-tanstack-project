@@ -1,3 +1,4 @@
+import { User, Session, Verification, Account } from "@/shared/entities/types/auth";
 import type { Item, Product } from "@/shared/entities/types/product";
 import type { Tag } from "@/shared/entities/types/tag";
 
@@ -9,7 +10,16 @@ type TProductToTag = {
 type TProduct = Omit<Product, "tags" | "items">;
 type TItem = Item;
 type TTag = Tag;
+type TUser = User;
+type TSession = Session;
+type TVerification = Verification;
+type TAccount = Account;
 // In-memory tables populated with some example data
+
+const tableUsers: TUser[] = [];
+const tableSessions: TSession[] = [];
+const tableVerifications: TVerification[] = [];
+const tableAccounts: TAccount[] = [];
 
 const tableProducts: TProduct[] = [
   {
@@ -62,7 +72,6 @@ const tableItems: TItem[] = [
     updatedAt: new Date(),
   },
 ];
-
 const tableTags: TTag[] = [
   {
     id: "tag-1",
@@ -79,7 +88,6 @@ const tableTags: TTag[] = [
     updatedAt: new Date(),
   },
 ];
-
 const tableTProductToTags: TProductToTag[] = [
   { productId: "prod-1", tagId: "tag-1" },
   { productId: "prod-1", tagId: "tag-2" },
@@ -236,5 +244,61 @@ export const InMemoryProductToTagDB = {
       .filter((ptt) => ptt.productId === productId)
       .map((ptt) => ptt.tagId);
     return tableTags.filter((t) => tagIds.includes(t.id));
+  },
+};
+
+export const InMemoryAuthDB = {
+  // Use a private-style method or a local function to avoid "cannot find name"
+  _getTable(modelName: string): any[] {
+    switch (modelName) {
+      case "user": return tableUsers;
+      case "session": return tableSessions;
+      case "account": return tableAccounts;
+      case "verification": return tableVerifications;
+      default: return [];
+    }
+  },
+
+  // Note: Better Auth expects these specific signatures
+  async create({ modelName, data }: { modelName: string; data: any }) {
+    const table = this._getTable(modelName);
+    table.push(data);
+    return data;
+  },
+
+  async findOne({ modelName, where }: { modelName: string; where: any[] }) {
+    const table = this._getTable(modelName);
+    return table.find((item) => 
+      where.every((w) => item[w.field] === w.value)
+    ) || null;
+  },
+
+  async findMany({ modelName, where }: { modelName: string; where?: any[] }) {
+    const table = this._getTable(modelName);
+    if (!where || where.length === 0) return table;
+    return table.filter((item) => 
+      where.every((w) => item[w.field] === w.value)
+    );
+  },
+
+  async update({ modelName, where, update }: { modelName: string; where: any[]; update: any }) {
+    const table = this._getTable(modelName);
+    const index = table.findIndex((item) => 
+      where.every((w) => item[w.field] === w.value)
+    );
+    if (index === -1) return null;
+    
+    table[index] = { ...table[index], ...update };
+    return table[index];
+  },
+
+  async delete({ modelName, where }: { modelName: string; where: any[] }) {
+    const table = this._getTable(modelName);
+    const index = table.findIndex((item) => 
+      where.every((w) => item[w.field] === w.value)
+    );
+    if (index !== -1) {
+      table.splice(index, 1);
+    }
   },
 };

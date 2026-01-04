@@ -1,16 +1,29 @@
+import { InMemoryAuthRepository } from "../repository/inmemory/auth.repository";
 import { InMemoryProductRepository } from "../repository/inmemory/product.repository";
 import { InMemoryTagRepository } from "../repository/inmemory/tag.repository";
+import { createAuthService } from "../service/auth.service";
 import { createProductService } from "../service/product.service";
 import { createTagService } from "../service/tag.service";
 
-export const initInjection = () => {
+export const injectProductService = () => {
   const productRepo = InMemoryProductRepository;
-  const tagRepo = InMemoryTagRepository;
+  return createProductService(productRepo);
+};
 
-  const productSvc = createProductService(productRepo);
-  const tagSvc = createTagService(tagRepo);
+export const injectTagService = () => {
+  const tagRepo = InMemoryTagRepository;
+  return createTagService(tagRepo);
+};
+
+export const injectAuthService = () => {
+  const authRepo = InMemoryAuthRepository;
+  return createAuthService(authRepo);
+}
+
+export const initInjection = () => {
   return {
-    productSvc,
-    tagSvc,
+    productSvc: injectProductService(),
+    tagSvc: injectTagService(),
+    authSvc: injectAuthService(),
   };
 };
